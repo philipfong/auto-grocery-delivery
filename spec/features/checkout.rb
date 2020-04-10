@@ -72,6 +72,7 @@ def select_delivery_time
 end
 
 def place_order
+  puts 'About to place order at %s' % Time.now
   click_button('Place order')
 end
 
