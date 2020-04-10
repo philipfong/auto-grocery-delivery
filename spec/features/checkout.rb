@@ -50,6 +50,8 @@ def wait_for_timeslot
         timeslot_found = true
         puts 'Oooh-weee, we found a timeslot'
         # TO_DO Maybe send an alert. The script can be unpredictable after this.
+      else
+        puts 'I can\'t seem to find what I\'m looking for anymore, are you sure you\'re on the checkout page?'
       end
     rescue Exception => e
       puts 'Something else went wrong. Retrying anyway. Error was: %s' % e
