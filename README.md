@@ -11,7 +11,7 @@ So far, I've written a script for Instacart only.
 3. It will wait for you to reach the checkout page. Assuming that there are no delivery windows, the script will wait a random number of seconds and refresh the page.
 4. If a timeslot becomes open, it will select it immediately and attempt the checkout process automatically.
 
-### Prequisites ###
+### Pre-requisites ###
 
 The easiest part is to just select your store and fill your cart. Go to the checkout screen when you're done. This will not work if you have items added from multiple stores, so please stick with just one.
 
