@@ -49,11 +49,9 @@ def wait_for_timeslot
       elsif page.has_text?('CHOOSE')
         timeslot_found = true
         puts 'Ohh boy, we found a timeslot'
-      else
-        puts 'Something else totally went wrong, but we\'ll try again anyway'
       end
     rescue Exception => e
-      puts 'Something else really really totally went wrong. Retrying anyway. Error was: %s' % e
+      puts 'Something else went wrong. Retrying anyway. Error was: %s' % e
       retry
     end
   end
