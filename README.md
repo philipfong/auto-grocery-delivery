@@ -21,7 +21,7 @@ The hardest part will be getting this script running in the first place. If you'
 
 ### Install and Run ###
 
-1. Install a Ruby version manager such as rbenv or rvm
+1. Install a Ruby version manager such as rbenv or rvm (on Windows, check out https://rubyinstaller.org/)
 2. Clone the repo
 3. `gem install bundler`
 4. `bundle install`
