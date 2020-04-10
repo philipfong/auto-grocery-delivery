@@ -6,9 +6,10 @@ So far, I've written a script for Instacart only.
 
 ### How does this work? ###
 
-The script will open a brand new browser session in Chrome and visit the Instacart page. From there, it will wait for you to reach the checkout page. Assuming that there are no delivery windows, the script will wait a random number of seconds and refresh the page.
-
-If a timeslot becomes open, it will select it immediately and attempt the checkout process automatically.
+1. The script will open a brand new browser session in Chrome
+2. It will then visit the Instacart page. From there you can shop around and add items to your cart.
+3. It will wait for you to reach the checkout page. Assuming that there are no delivery windows, the script will wait a random number of seconds and refresh the page.
+4. If a timeslot becomes open, it will select it immediately and attempt the checkout process automatically.
 
 ### Prequisites ###
 
