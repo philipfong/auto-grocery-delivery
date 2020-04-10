@@ -7,6 +7,7 @@ feature "Check time slots of various online delivery apps" do
     wait_for_checkout_page
     wait_for_timeslot
     select_delivery_time
+    place_order
   end
 
 end
@@ -21,9 +22,11 @@ def open_instacart
 end
 
 def wait_for_checkout_page
-  while true
+  checkout_found = false
+  while !checkout_found
     begin
       page.should have_text('No delivery times available')
+      checkout_found = true
       puts 'Hi there! Looks like you are on the checkout page. Proceeding with checking delivery time slots...'
     rescue RSpec::Expectations::ExpectationNotMetError
       puts 'I am waiting for you to checkout. Take your time!'
@@ -34,14 +37,17 @@ def wait_for_checkout_page
 end
 
 def wait_for_timeslot
-  random_seconds = rand(10..60)
   timeslot_found = false
   while !timeslot_found
+    random_seconds = rand(10..60)
     begin
       if page.has_text?('No delivery times available')
         puts 'Waiting for %s seconds and trying again' % random_seconds
         sleep random_seconds
+        visit current_url
+        wait_for_instacart_throbber
       elsif page.has_text?('CHOOSE')
+        timeslot_found = true
         puts 'Ohh boy, we found a timeslot'
       else
         puts 'Something else totally went wrong, but we\'ll try again anyway'
@@ -67,4 +73,15 @@ end
 
 def place_order
   click_button('Place order')
+end
+
+def wait_for_instacart_throbber
+  begin
+    using_wait_time 10 do # These spinners can take a little while to show up and disappear, but is important to check so that we know the page is done loading
+      page.should have_css('.ic-loading')
+      page.should_not have_css('.ic-loading')
+    end
+  rescue Exception => e
+    puts 'Something wrong happened checking for Instacart\'s spinny animations. This is not important enough to do something about, so let\s do nothing.'
+  end
 end
