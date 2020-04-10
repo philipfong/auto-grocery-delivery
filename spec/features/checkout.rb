@@ -49,6 +49,7 @@ def wait_for_timeslot
       elsif page.has_text?('CHOOSE')
         timeslot_found = true
         puts 'Ohh boy, we found a timeslot'
+        # TO_DO Maybe send an alert. The script can be unpredictable after this.
       end
     rescue Exception => e
       puts 'Something else went wrong. Retrying anyway. Error was: %s' % e
@@ -58,11 +59,16 @@ def wait_for_timeslot
 end
 
 def select_delivery_time
-  click_button('CHOOSE')
-  if page.has_button?('Continue')
+  begin
+    page.should have_css('button', :text => 'CHOOSE', :wait => 10) # Extend wait period, on occasion the button takes a while to become active
+    click_button('CHOOSE')
+  rescue Exception => e
+    puts 'Something went wrong once the button was found %s' % e
+  end
+  if page.has_button?('Continue') # There is a step that can come up that asks for a note to the delivery driver
     click_button('Continue')
   end
-  if page.has_text?('Please re-enter your card number.')
+  if page.has_text?('Please re-enter your card number.') # This also comes up on occasion, mostly for those who have never placed an Instacart order
     fail 'Sorry about that. It looks like Instacart needs your card info again. We\'re going to stop here.'
   end
   using_wait_time 10 do
