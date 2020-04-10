@@ -65,8 +65,10 @@ def select_delivery_time
   if page.has_text?('Please re-enter your card number.')
     fail 'Sorry about that. It looks like Instacart needs your card info again. We\'re going to stop here.'
   end
-  page.should_not have_css('#Delivery options')
-  page.should_not have_css('.ic-loading')
+  using_wait_time 10 do
+    page.should_not have_css('#Delivery options')
+    page.should_not have_css('.ic-loading')
+  end
 end
 
 def place_order
