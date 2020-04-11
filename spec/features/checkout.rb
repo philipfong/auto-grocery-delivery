@@ -2,6 +2,12 @@ require 'spec_helper'
 
 feature "Check time slots of various online delivery apps" do
 
+  before(:all) do
+    if ENV["CARD"] == nil || ENV["EXP"] == nil || ENV["CVV"] == nil
+      Log.info 'Still in beta: No card info was passed on execution, so let\'s cross our fingers on checkout.'
+    end
+  end
+
   scenario "Instacart" do
     open_instacart
     wait_for_checkout_page
@@ -32,7 +38,6 @@ end
 def refresh_checkout
   visit current_url
   page.should have_text('Choose delivery time', :wait => 10)
-  Log.info 'Page has fully refreshed and checkout page found, checking spinner now.'
   wait_for_instacart_throbber
 end
 
