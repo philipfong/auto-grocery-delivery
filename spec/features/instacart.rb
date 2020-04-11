@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature "Check time slots of various online delivery apps" do
+feature "Check time slots for Instacart" do
 
   before(:all) do
     if ENV["CARD"] == nil || ENV["EXP"] == nil || ENV["CVV"] == nil
