@@ -23,7 +23,7 @@ def open_instacart
     visit 'https://www.instacart.com/'
     page.should have_text 'Groceries delivered in as little as 1 hour'
   rescue Exception => e
-    Log.error 'Something went fatally wrong. Please reach out on Github.'
+    Log.error 'You might be having problems getting this running in the first place, or Instacart changed their homepage content. Please reach out to me on Github for help.'
   end
 end
 
