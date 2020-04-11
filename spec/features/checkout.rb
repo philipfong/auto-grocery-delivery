@@ -31,7 +31,7 @@ end
 
 def refresh_checkout
   visit current_url
-  page.should_not have_text('Choose delivery time')
+  page.should_not have_css('.module-renderer')
   page.should have_text('Choose delivery time', :wait => 10)
   wait_for_instacart_throbber
 end
