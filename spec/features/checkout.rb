@@ -31,8 +31,8 @@ end
 
 def refresh_checkout
   visit current_url
-  page.should_not have_text('Choose delivery time')
   page.should have_text('Choose delivery time', :wait => 10)
+  Log.info 'Page has fully refreshed and checkout page found, checking spinner now.'
   wait_for_instacart_throbber
 end
 
