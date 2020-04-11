@@ -26,6 +26,13 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c| # Allow should syntax, which is now deprecated in rspec3
     c.syntax = [:should, :expect]
   end
+  config.after(:each) do |example|
+    if example.exception
+      file_name = 'checkout_failure_%s.png' % Time.now.to_s
+      file_name = file_name.gsub(/[^\w\.]/,"_")
+      page.save_screenshot('failure_screenshots/%s' % file_name)
+    end
+  end
 end
 
 # Capybara.default_max_wait_time = 10 # Waiting for an element will timeout at 10 seconds
