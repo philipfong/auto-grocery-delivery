@@ -21,6 +21,21 @@ def open_instacart
   end
 end
 
+def goto_checkout
+  visit 'https://www.instacart.com'
+  click_button('Cart')
+  click_link('Go to Checkout')
+  page.should have_text('Choose delivery time', :wait => 10)
+  wait_for_instacart_throbber
+end
+
+def refresh_checkout
+  visit current_url
+  page.should_not have_text('Choose delivery time')
+  page.should have_text('Choose delivery time', :wait => 10)
+  wait_for_instacart_throbber
+end
+
 def wait_for_checkout_page
   checkout_found = false
   while !checkout_found
@@ -44,23 +59,37 @@ def wait_for_timeslot
       if page.has_text?('No delivery times available')
         Log.info 'Waiting for %s seconds and trying again' % random_seconds
         sleep random_seconds
-        visit current_url
-        wait_for_instacart_throbber
+        refresh_checkout
       elsif page.has_text?('CHOOSE')
         timeslot_found = true
         Log.info 'Oooh-weee, we found a timeslot'
-        # TO_DO Maybe send an alert. The script can be unpredictable after this.
       elsif page.has_text?('maintenance')
         Log.info 'It looks like Instacart is under maintenance. Attempting to get to checkout page myself.'
-        visit 'https://www.instacart.com/store/checkout_v3'
-        wait_for_instacart_throbber
+        goto_checkout
+      elsif page.has_css?('.error-module')
+        Log.error 'It looks like the website is having problems. Attempting to display error message and get to checkout page myself.'
+        error_message = find('.error-module').text
+        Log.error error_message
+        goto_checkout
       else
-        Log.error 'I can\'t seem to find what I\'m looking for anymore, are you sure you\'re on the checkout page?'
+        Log.error 'I can\'t seem to find what I\'m looking for anymore, are you sure you\'re on the checkout page? I\'ll try to get there myself.'
+        goto_checkout
       end
     rescue Exception => e
       Log.error 'Something else went wrong. Retrying anyway. Error was: %s' % e
       retry
     end
+  end
+end
+
+def wait_for_instacart_throbber
+  begin
+    using_wait_time 10 do # These spinners can take a little while to show up and disappear, but is important to check so that we know the page is done loading
+      page.should have_css('.ic-loading')
+      page.should_not have_css('.ic-loading')
+    end
+  rescue Exception => e
+    Log.error 'Something wrong happened checking for Instacart\'s spinny animations. This is not important enough to do something about, so let\s do nothing.'
   end
 end
 
@@ -84,22 +113,11 @@ def select_delivery_time
 end
 
 def place_order
-  Log.info 'About to place order at %s' % Time.now
+  Log.info 'About to place order!'
   begin
     page.should have_css('button', :text => 'Place order', :wait => 10)
     click_button('Place order')
   rescue Exception => e
     Log.error 'Something went wrong once the place order button was found'
-  end
-end
-
-def wait_for_instacart_throbber
-  begin
-    using_wait_time 10 do # These spinners can take a little while to show up and disappear, but is important to check so that we know the page is done loading
-      page.should have_css('.ic-loading')
-      page.should_not have_css('.ic-loading')
-    end
-  rescue Exception => e
-    Log.error 'Something wrong happened checking for Instacart\'s spinny animations. This is not important enough to do something about, so let\s do nothing.'
   end
 end
