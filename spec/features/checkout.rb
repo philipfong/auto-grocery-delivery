@@ -17,7 +17,7 @@ def open_instacart
     visit 'https://www.instacart.com/'
     page.should have_text 'Groceries delivered in as little as 1 hour'
   rescue Exception => e
-    puts 'Something went fatally wrong. Please reach out on Github.'
+    Log.error 'Something went fatally wrong. Please reach out on Github.'
   end
 end
 
@@ -27,9 +27,9 @@ def wait_for_checkout_page
     begin
       page.should have_text('No delivery times available')
       checkout_found = true
-      puts 'Hi there! Looks like you are on the checkout page. Proceeding with checking delivery time slots...'
+      Log.info 'Hi there! Looks like you are on the checkout page. Proceeding with checking delivery time slots...'
     rescue RSpec::Expectations::ExpectationNotMetError
-      puts 'I am waiting for you to checkout. Take your time!'
+      Log.info 'I am waiting for you to checkout. Take your time!'
       sleep 60
       retry
     end
@@ -42,19 +42,23 @@ def wait_for_timeslot
     random_seconds = rand(10..60)
     begin
       if page.has_text?('No delivery times available')
-        puts 'Waiting for %s seconds and trying again' % random_seconds
+        Log.info 'Waiting for %s seconds and trying again' % random_seconds
         sleep random_seconds
         visit current_url
         wait_for_instacart_throbber
       elsif page.has_text?('CHOOSE')
         timeslot_found = true
-        puts 'Oooh-weee, we found a timeslot'
+        Log.info 'Oooh-weee, we found a timeslot'
         # TO_DO Maybe send an alert. The script can be unpredictable after this.
+      elsif page.has_text?('maintenance')
+        Log.info 'It looks like Instacart is under maintenance. Attempting to get to checkout page myself.'
+        visit 'https://www.instacart.com/store/checkout_v3'
+        wait_for_instacart_throbber
       else
-        puts 'I can\'t seem to find what I\'m looking for anymore, are you sure you\'re on the checkout page?'
+        Log.error 'I can\'t seem to find what I\'m looking for anymore, are you sure you\'re on the checkout page?'
       end
     rescue Exception => e
-      puts 'Something else went wrong. Retrying anyway. Error was: %s' % e
+      Log.error 'Something else went wrong. Retrying anyway. Error was: %s' % e
       retry
     end
   end
@@ -65,7 +69,7 @@ def select_delivery_time
     page.should have_css('button', :text => 'CHOOSE', :wait => 10) # Extend wait period, on occasion the button takes a while to become active
     click_button('CHOOSE')
   rescue Exception => e
-    puts 'Something went wrong once the choose timeslot button was found %s' % e
+    Log.error 'Something went wrong once the choose timeslot button was found %s' % e
   end
   using_wait_time 10 do
     page.should_not have_css('#Delivery options')
@@ -80,12 +84,12 @@ def select_delivery_time
 end
 
 def place_order
-  puts 'About to place order at %s' % Time.now
+  Log.info 'About to place order at %s' % Time.now
   begin
     page.should have_css('button', :text => 'Place order', :wait => 10)
     click_button('Place order')
   rescue Exception => e
-    puts 'Something went wrong once the place order button was found'
+    Log.error 'Something went wrong once the place order button was found'
   end
 end
 
@@ -96,6 +100,6 @@ def wait_for_instacart_throbber
       page.should_not have_css('.ic-loading')
     end
   rescue Exception => e
-    puts 'Something wrong happened checking for Instacart\'s spinny animations. This is not important enough to do something about, so let\s do nothing.'
+    Log.error 'Something wrong happened checking for Instacart\'s spinny animations. This is not important enough to do something about, so let\s do nothing.'
   end
 end

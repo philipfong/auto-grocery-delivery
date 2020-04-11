@@ -18,6 +18,8 @@ require 'webdrivers'
 require 'capybara/rspec'
 require 'selenium-webdriver'
 require 'fileutils'
+require 'logger'
+require 'helper_functions'
 
 RSpec.configure do |config|
   config.order = 'default' # Run specs in default order
