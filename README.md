@@ -4,12 +4,18 @@ Everyone's been having a tough time getting delivery slots for grocery delivery 
 
 So far, I've written a script for Instacart only.
 
+Update (4/11/2020): I've added support for Whole Foods, though it is limited in its ability to checkout. It will comb through date availability and then redirect to zombo.com, like it's 1999.
+
 ### How does this work? ###
 
 1. The script will open a brand new browser session in Chrome
 2. It will then visit the Instacart page. From there you can shop around and add items to your cart.
 3. It will wait for you to reach the checkout page. Assuming that there are no delivery windows, the script will wait a random number of seconds and refresh the page.
 4. If a timeslot becomes open, it will select it immediately and attempt the checkout process automatically.
+
+### Some advantages over other tools ###
+
+A lot of other scripts will add sleep/delays in order to wait for pages. This actively waits for elements with a timeout of 10 seconds. This is all credit to [team capybara](https://github.com/teamcapybara/capybara).
 
 ### Pre-requisites ###
 
