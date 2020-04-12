@@ -111,9 +111,9 @@ end
 
 def complete_checkout
   using_wait_time 1800 do
-    page.should have_text('Select a payment method', :wait => 1800)
+    page.should have_text('Select a payment method')
     find('#continue-top').click
-    page.should have_text('Place your order', :wait => 1800)
+    page.should have_text('Place your order')
     find('#placeYourOrder').click
   end
 end
