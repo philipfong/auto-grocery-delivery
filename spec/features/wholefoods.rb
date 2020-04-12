@@ -74,7 +74,8 @@ def check_dates
         Log.info 'Oooh-weee, we found a timeslot for %s!' % date_found
         timeslot_found = true
         # I have no idea what to do here yet, since I don't really know what a valid timeslot actually looks like.
-        page.save_screenshot('found_timeslot.png') # Save screenshot as proof, at least.
+        page.save_screenshot # Save screenshot as proof, at least.
+        page.save_page
         visit 'https://html5zombo.com/' # Play a sound. Lol.
       end
     end
