@@ -28,13 +28,13 @@ RSpec.configure do |config|
   end
   config.after(:each) do |example|
     if example.exception
-      file_name = 'checkout_failure_%s.png' % Time.now.to_s
-      file_name = file_name.gsub(/[^\w\.]/,"_")
-      page.save_screenshot('failure_screenshots/%s' % file_name)
+      page.save_screenshot
+      page.save_page
     end
   end
 end
 
+Capybara.save_path = 'failure_assets'
 Capybara.default_max_wait_time = 5 # Waiting for an element will timeout at 5 seconds
 Capybara.default_normalize_ws = true # Allow relaxed matching of lengthier blocks of text
 

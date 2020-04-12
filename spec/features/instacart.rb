@@ -24,6 +24,7 @@ def open_instacart
     page.should have_text 'Groceries delivered in as little as 1 hour'
   rescue Exception => e
     Log.error 'You might be having problems getting this running in the first place, or Instacart changed their homepage content. Please reach out to me on Github for help.'
+    fail 'Could not load Instacart page'
   end
 end
 
@@ -102,6 +103,7 @@ def select_delivery_time
     click_button('CHOOSE')
   rescue Exception => e
     Log.error 'Something went wrong once the choose timeslot button was found %s' % e
+    fail 'Failing because choosing the timeslot didn\'t work out'
   end
   page.should_not have_css('#Delivery options')
   page.should_not have_css('.ic-loading')
@@ -120,5 +122,6 @@ def place_order
     click_button('Place order')
   rescue Exception => e
     Log.error 'Something went wrong once the place order button was found'
+    fail 'Failing because order could not be placed'
   end
 end
