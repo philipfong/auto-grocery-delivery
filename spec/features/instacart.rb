@@ -152,9 +152,10 @@ def place_order
   Log.info 'About to place order!'
   begin
     page.should have_css('button', :text => 'Place order')
-    click_button('Place order')
+    all('button', :text => 'Place order', :minimum => 1)[0].click
   rescue Exception => e
     Log.error 'Something went wrong once the place order button was found'
+    Log.error e
     fail 'Failing because order could not be placed'
   end
 end

@@ -80,7 +80,8 @@ def check_availability
         all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click
         sleep 1 # I'm not sure how the page responds after clicking the timeslot, so I'm doing this just in case
         find('.a-button-primary', :text => 'Continue').click
-        page.should_not have_text('Schedule your order') # Ensure that page has changed. I don't remember what's on the next page.
+        # page.should have_css('#loading-spinner-img') # TO_DO Add another method for a throbber check
+        page.should_not have_text('Schedule your order', :text => 120) # This can take an incredibly long time with the loading spinner showing up
       end
     end
   rescue RSpec::Expectations::ExpectationNotMetError => e
