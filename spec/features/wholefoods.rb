@@ -80,6 +80,7 @@ def check_availability
         all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click # Click the last timeslot available. Perhaps this gets last traffic.
         sleep 1
         find('.a-button-primary', :text => 'Continue').click
+        Log.info 'We have clicked on the continue button and should leave the timeslot page.'
         page.should_not have_text('Schedule your order', :wait => 1800) # This can take an incredibly long time with the loading spinner showing up
       end
     end
@@ -110,6 +111,7 @@ def restart_checkout
 end
 
 def complete_checkout
+  Log.info 'Attempting to complete checkout now.'
   using_wait_time 1800 do
     page.should have_text('Select a payment method')
     find('#continue-top').click
