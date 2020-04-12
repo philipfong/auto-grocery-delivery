@@ -112,6 +112,6 @@ end
 
 def complete_checkout
   all('.a-button-primary', :text => 'Continue', :minimum => 1)[0].click # I don't remember how many of these there were
-  page.should have_text('Place your order')
+  page.should have_text('Place your order', :wait => 120)
   find('#placeYourOrder', :text => 'Place your order').click
 end
