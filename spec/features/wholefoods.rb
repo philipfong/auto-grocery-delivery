@@ -53,7 +53,7 @@ def get_timeslot
   @timeslot_found = false
   while !@timeslot_found
     begin
-      page.should have_text('Schedule your order')
+      page.should have_text('Schedule your order', :wait => 30) # This page can show up so embarassingly slow for Amazon. Pls.
     rescue RSpec::Expectations::ExpectationNotMetError
       Log.info 'Maybe got kicked out to some other page? Going to try to checkout for you again.'
       restart_checkout
