@@ -5,6 +5,7 @@ feature "Check time slots for Instacart" do
   before(:all) do
     if ENV["CARD"] == nil || ENV["EXP"] == nil || ENV["CVV"] == nil
       Log.info 'Still in beta: No card info was passed on execution, so let\'s cross our fingers on checkout.'
+      @card_info_found = false
     end
   end
 
@@ -13,6 +14,8 @@ feature "Check time slots for Instacart" do
     wait_for_checkout_page
     wait_for_timeslot
     select_delivery_time
+    reconfirm_payment
+    confirm_contact_sharing
     place_order
   end
 
@@ -98,20 +101,50 @@ def wait_for_instacart_throbber
 end
 
 def select_delivery_time
+  timeslot_selected = false
   begin
-    page.should have_css('button', :text => 'CHOOSE', :wait => 10) # Extend wait period, on occasion the button takes a while to become active
-    click_button('CHOOSE')
+    while !timeslot_selected
+      find('[id*="Delivery"]').all('input[name="delivery_option"]', :minimum => 1)[0].click # Find and click first available
+      wait_for_instacart_throbber
+      if page.has_css?('[id*="Delivery"]') # Here we probably got the "Demand is higher than normal message" and have to try again
+        next
+      else
+        timeslot_selected = true
+        Log.info 'Timeslot selected'
+      end
+    end
   rescue Exception => e
     Log.error 'Something went wrong once the choose timeslot button was found %s' % e
     fail 'Failing because choosing the timeslot didn\'t work out'
   end
-  page.should_not have_css('#Delivery options')
+  page.should_not have_css('[id*="Delivery"]')
   page.should_not have_css('.ic-loading')
   if page.has_button?('Continue') # There is a step that can come up that asks for a note to the delivery driver
+    Log.info 'Delivery notes were requested, we are just dismissing this one.'
     click_button('Continue')
   end
+end
+
+def reconfirm_payment
   if page.has_text?('Please re-enter your card number.') # This also comes up on occasion, mostly for those who have never placed an Instacart order
-    fail 'Sorry about that. It looks like Instacart needs your card info again. We\'re going to stop here.'
+    Log.info 'Payment info was requested'
+    if @card_info_found == false
+      Log.error 'We aren\'t able to complete checkout due to Instacart asking to reconfirm card details.'
+      fail 'Sorry about that. It looks like Instacart needs your card info again. We\'re going to stop here.'
+    else
+      Log.info 'Payment info was not requested'
+      # TO_DO Input card details into checkout
+    end
+  end
+end
+
+def confirm_contact_sharing
+  if page.has_text?('Share my contact information and order details with')
+    Log.info 'Contact sharing requested'
+    click_button('Allow')
+    page.should have_text('Opted In')
+  else
+    Log.info 'Contact sharing was not asked for during this checkout.'
   end
 end
 
