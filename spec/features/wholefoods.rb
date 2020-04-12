@@ -94,7 +94,7 @@ end
 
 def retry_if_no_availability
   if @timeslot_found == false
-    random_seconds = rand(10..60)
+    random_seconds = rand(3..10)
     Log.info 'Bummer, nothing is available. Trying again after waiting for %s seconds.' % random_seconds
     find('.a-button-primary', :text => 'Continue').click # Do this so Capybara can detect change in page refresh
     page.should have_text('Select a window to continue')
