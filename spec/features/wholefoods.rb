@@ -6,7 +6,8 @@ feature "Check time slots for Whole Foods" do
     open_amazon
     wait_for_cart
     goto_time_windows
-    check_availability
+    get_timeslot
+    complete_checkout
   end
 
 end
@@ -48,7 +49,7 @@ def goto_time_windows
   end
 end
 
-def check_availability
+def get_timeslot
   @timeslot_found = false
   while !@timeslot_found
     begin
@@ -56,36 +57,41 @@ def check_availability
     rescue RSpec::Expectations::ExpectationNotMetError
       Log.info 'Maybe got kicked out to some other page? Going to try to checkout for you again.'
       restart_checkout
-      next # I can't seem to break out this begin-rescue block into its own method because of this call to next
+      next
     end
-    check_dates
-    retry_if_nodelivery
+    check_availability
+    retry_if_no_availability
   end
 end
 
-def check_dates
+def check_availability
   begin
     date_buttons = all('button[name*="2020"]', :minimum => 1)
     date_buttons.each.with_index do |button, index|
+      name = date_buttons[index][:name]
       if button.has_text?('Not available')
-        Log.info 'Found no slots on button number %s' % (index + 1)
+        Log.info 'Found no availability on %s' % name
       else
-        date_found = date_buttons[index][:name]
-        Log.info 'Oooh-weee, we found a timeslot for %s!' % date_found
-        timeslot_found = true
-        # I have no idea what to do here yet, since I don't really know what a valid timeslot actually looks like.
-        page.save_screenshot # Save screenshot as proof, at least.
-        page.save_page
-        visit 'https://html5zombo.com/' # Play a sound. Lol.
+        Log.info 'Oooh-weee, we found availability on %s!' % name
+        @timeslot_found = true
+        date_buttons[index].click # Select the date
+        Log.info 'We have clicked on the date where availability was found.'
       end
     end
+    page.should_not have_text('No delivery windows available')
+    find('.a-button-normal', :text => 'FREE').click
+    sleep 1 # I'm not sure how the page responds after clicking the timeslot, so I'm doing this just in case
+    find('.a-button-primary', :text => 'Continue').click
+    page.should_not have_text('Schedule your order') # Ensure that page has changed. I don't remember what's on the next page.
   rescue RSpec::Expectations::ExpectationNotMetError
-    Log.error 'Ehh, something went wrong checking the text in the date buttons. Let\'s start over?'
+    Log.error 'Something went wrong finding and selecting an available timeslot. Restarting checkout.'
+    page.save_page # Save some information for troubleshooting if something goes wrong here
+    page.save_screenshot
     restart_checkout
   end
 end
 
-def retry_if_nodelivery
+def retry_if_no_availability
   if @timeslot_found == false
     random_seconds = rand(10..60)
     Log.info 'Bummer, nothing is available. Trying again after waiting for %s seconds.' % random_seconds
@@ -101,4 +107,10 @@ def restart_checkout
   visit 'https://www.amazon.com/gp/cart/view.html?ref_=nav_cart'
   wait_for_cart
   goto_time_windows
+end
+
+def complete_checkout
+  all('.a-button-primary', :text => 'Continue', :minimum => 1)[0].click # I don't remember how many of these there were
+  page.should have_text('Place your order')
+  find('#placeYourOrder', :text => 'Place your order').click
 end

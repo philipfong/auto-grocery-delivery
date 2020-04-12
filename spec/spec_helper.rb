@@ -28,8 +28,8 @@ RSpec.configure do |config|
   end
   config.after(:each) do |example|
     if example.exception
-      page.save_screenshot
       page.save_page
+      page.save_screenshot
     end
   end
 end
