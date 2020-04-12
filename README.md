@@ -4,7 +4,7 @@ Everyone's been having a tough time getting delivery slots for grocery delivery 
 
 So far, I've written a script for Instacart only.
 
-Update (4/11/2020): I've added support for Whole Foods, though it is limited in its ability to checkout. It will comb through date availability and then redirect to zombo.com, like it's 1999.
+Update (4/11/2020): I've added support for Whole Foods, though it is limited in its ability to checkout. It will comb through dates, and after finding availability, will redirect to zombo.com like it's 1999.
 
 ### How does this work? ###
 
