@@ -77,8 +77,8 @@ def check_availability
         date_buttons[index].click # Select the date
         Log.info 'We have clicked on the date where availability was found.'
         page.should_not have_text('No delivery windows available')
-        all('.a-button-normal', :text => 'FREE', :minimum => 1).last.click # Click the last timeslot available. Perhaps this gets last traffic.
-        page.should have_css('button[aria-pressed="true"]')
+        all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click # Click the last timeslot available. Perhaps this gets last traffic.
+        sleep 1
         find('.a-button-primary', :text => 'Continue').click
         page.should_not have_text('Schedule your order', :wait => 1800) # This can take an incredibly long time with the loading spinner showing up
       end
