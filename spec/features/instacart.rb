@@ -72,6 +72,7 @@ def wait_for_timeslot
       elsif page.has_text?('CHOOSE', :wait => 2)
         timeslot_found = true
         Log.info 'Oooh-weee, we found a timeslot'
+        page.save_screenshot
       elsif page.has_text?('maintenance', :wait => 2)
         Log.info 'It looks like Instacart is under maintenance. Attempting to get to checkout page myself.'
         goto_checkout
