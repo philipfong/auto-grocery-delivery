@@ -110,7 +110,10 @@ def restart_checkout
 end
 
 def complete_checkout
-  all('.a-button-primary', :text => 'Continue', :minimum => 1)[0].click # I don't remember how many of these there were
-  page.should have_text('Place your order', :wait => 1800)
-  find('#placeYourOrder', :text => 'Place your order').click
+  using_wait_time 1800 do
+    page.should have_text('Select a payment method', :wait => 1800)
+    find('#continue-top').click
+    page.should have_text('Place your order', :wait => 1800)
+    find('#placeYourOrder').click
+  end
 end
