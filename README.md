@@ -15,7 +15,7 @@ Update (4/11/2020): I've added support for Whole Foods, though it is limited in 
 
 ### Some advantages over other tools ###
 
-A lot of other scripts will add sleep/delays in order to wait for pages. This actively waits for elements with a timeout of 10 seconds. This is all credit to [team capybara](https://github.com/teamcapybara/capybara).
+A lot of other scripts will add sleep/delays in order to wait for pages. This set of scripts waits for elements with a timeout of 10 seconds. This is all credit to [team capybara](https://github.com/teamcapybara/capybara).
 
 ### Pre-requisites ###
 
