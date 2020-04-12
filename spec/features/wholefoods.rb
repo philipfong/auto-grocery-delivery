@@ -81,7 +81,7 @@ def check_availability
         sleep 1 # I'm not sure how the page responds after clicking the timeslot, so I'm doing this just in case
         find('.a-button-primary', :text => 'Continue').click
         # page.should have_css('#loading-spinner-img') # TO_DO Add another method for a throbber check
-        page.should_not have_text('Schedule your order', :text => 120) # This can take an incredibly long time with the loading spinner showing up
+        page.should_not have_text('Schedule your order', :text => 1800) # This can take an incredibly long time with the loading spinner showing up
       end
     end
   rescue RSpec::Expectations::ExpectationNotMetError => e
@@ -112,6 +112,6 @@ end
 
 def complete_checkout
   all('.a-button-primary', :text => 'Continue', :minimum => 1)[0].click # I don't remember how many of these there were
-  page.should have_text('Place your order', :wait => 120)
+  page.should have_text('Place your order', :wait => 1800)
   find('#placeYourOrder', :text => 'Place your order').click
 end
