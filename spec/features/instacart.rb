@@ -120,7 +120,7 @@ def select_delivery_time
   page.should_not have_css('[id*="Delivery"]')
   page.should_not have_css('.ic-loading')
   if page.has_button?('Continue') # There is a step that can come up that asks for a note to the delivery driver
-    Log.info 'Delivery notes were requested, we are just dismissing this one.'
+    Log.info 'Delivery instructions were requested, we are just dismissing this one.'
     click_button('Continue')
   end
 end
