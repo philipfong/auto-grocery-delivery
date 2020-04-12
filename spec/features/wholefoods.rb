@@ -77,7 +77,7 @@ def check_availability
         date_buttons[index].click # Select the date
         Log.info 'We have clicked on the date where availability was found.'
         page.should_not have_text('No delivery windows available')
-        find('.a-button-normal', :text => 'FREE').click
+        all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click
         sleep 1 # I'm not sure how the page responds after clicking the timeslot, so I'm doing this just in case
         find('.a-button-primary', :text => 'Continue').click
         page.should_not have_text('Schedule your order') # Ensure that page has changed. I don't remember what's on the next page.
