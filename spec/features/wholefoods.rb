@@ -76,15 +76,15 @@ def check_availability
         @timeslot_found = true
         date_buttons[index].click # Select the date
         Log.info 'We have clicked on the date where availability was found.'
+        page.should_not have_text('No delivery windows available')
+        find('.a-button-normal', :text => 'FREE').click
+        sleep 1 # I'm not sure how the page responds after clicking the timeslot, so I'm doing this just in case
+        find('.a-button-primary', :text => 'Continue').click
+        page.should_not have_text('Schedule your order') # Ensure that page has changed. I don't remember what's on the next page.
       end
     end
-    page.should_not have_text('No delivery windows available')
-    find('.a-button-normal', :text => 'FREE').click
-    sleep 1 # I'm not sure how the page responds after clicking the timeslot, so I'm doing this just in case
-    find('.a-button-primary', :text => 'Continue').click
-    page.should_not have_text('Schedule your order') # Ensure that page has changed. I don't remember what's on the next page.
-  rescue RSpec::Expectations::ExpectationNotMetError
-    Log.error 'Something went wrong finding and selecting an available timeslot. Restarting checkout.'
+  rescue RSpec::Expectations::ExpectationNotMetError => e
+    Log.error 'Something went wrong finding and selecting an available timeslot. Restarting checkout. Error was %s' % e
     page.save_page # Save some information for troubleshooting if something goes wrong here
     page.save_screenshot
     restart_checkout
