@@ -81,7 +81,7 @@ def check_availability
         sleep 1 # I'm not sure how the page responds after clicking the timeslot, so I'm doing this just in case
         find('.a-button-primary', :text => 'Continue').click
         # page.should have_css('#loading-spinner-img') # TO_DO Add another method for a throbber check
-        page.should_not have_text('Schedule your order', :text => 1800) # This can take an incredibly long time with the loading spinner showing up
+        page.should_not have_text('Schedule your order', :wait => 1800) # This can take an incredibly long time with the loading spinner showing up
       end
     end
   rescue RSpec::Expectations::ExpectationNotMetError => e
@@ -98,7 +98,7 @@ def retry_if_no_availability
     Log.info 'Bummer, nothing is available. Trying again after waiting for %s seconds.' % random_seconds
     find('.a-button-primary', :text => 'Continue').click # Do this so Capybara can detect change in page refresh
     page.should have_text('Select a window to continue')
-    sleep random_seconds
+    # sleep random_seconds
     visit current_url
     page.should_not have_text('Select a window to continue')
   end
