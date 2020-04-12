@@ -35,7 +35,7 @@ RSpec.configure do |config|
   end
 end
 
-# Capybara.default_max_wait_time = 10 # Waiting for an element will timeout at 10 seconds
+Capybara.default_max_wait_time = 5 # Waiting for an element will timeout at 5 seconds
 Capybara.default_normalize_ws = true # Allow relaxed matching of lengthier blocks of text
 
 Capybara.default_driver = :selenium_chrome

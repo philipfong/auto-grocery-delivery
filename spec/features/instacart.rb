@@ -31,13 +31,13 @@ def goto_checkout
   visit 'https://www.instacart.com'
   click_button('Cart')
   click_link('Go to Checkout')
-  page.should have_text('Choose delivery time', :wait => 10)
+  page.should have_text('Choose delivery time')
   wait_for_instacart_throbber
 end
 
 def refresh_checkout
   visit current_url
-  page.should have_text('Choose delivery time', :wait => 10)
+  page.should have_text('Choose delivery time')
   wait_for_instacart_throbber
 end
 
@@ -65,13 +65,13 @@ def wait_for_timeslot
         Log.info 'Waiting for %s seconds and trying again' % random_seconds
         sleep random_seconds
         refresh_checkout
-      elsif page.has_text?('CHOOSE')
+      elsif page.has_text?('CHOOSE', :wait => 2)
         timeslot_found = true
         Log.info 'Oooh-weee, we found a timeslot'
-      elsif page.has_text?('maintenance')
+      elsif page.has_text?('maintenance', :wait => 2)
         Log.info 'It looks like Instacart is under maintenance. Attempting to get to checkout page myself.'
         goto_checkout
-      elsif page.has_css?('.error-module')
+      elsif page.has_css?('.error-module', :wait => 2)
         Log.error 'It looks like the website is having problems. Attempting to display error message and get to checkout page myself.'
         error_message = find('.error-module').text
         Log.error error_message
@@ -89,10 +89,8 @@ end
 
 def wait_for_instacart_throbber
   begin
-    using_wait_time 10 do # These spinners can take a little while to show up and disappear, but is important to check so that we know the page is done loading
-      page.should have_css('.ic-loading')
-      page.should_not have_css('.ic-loading')
-    end
+    page.should have_css('.ic-loading')
+    page.should_not have_css('.ic-loading')
   rescue Exception => e
     Log.error 'Something wrong happened checking for Instacart\'s spinny animations. This is not important enough to do something about, so let\s do nothing.'
   end
@@ -105,10 +103,8 @@ def select_delivery_time
   rescue Exception => e
     Log.error 'Something went wrong once the choose timeslot button was found %s' % e
   end
-  using_wait_time 10 do
-    page.should_not have_css('#Delivery options')
-    page.should_not have_css('.ic-loading')
-  end
+  page.should_not have_css('#Delivery options')
+  page.should_not have_css('.ic-loading')
   if page.has_button?('Continue') # There is a step that can come up that asks for a note to the delivery driver
     click_button('Continue')
   end
@@ -120,7 +116,7 @@ end
 def place_order
   Log.info 'About to place order!'
   begin
-    page.should have_css('button', :text => 'Place order', :wait => 10)
+    page.should have_css('button', :text => 'Place order')
     click_button('Place order')
   rescue Exception => e
     Log.error 'Something went wrong once the place order button was found'
