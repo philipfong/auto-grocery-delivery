@@ -105,6 +105,7 @@ def retry_if_no_availability
 end
 
 def restart_checkout
+  Log.info 'Restarting checkout. Something must\'ve went wrong just before this.'
   visit 'https://www.amazon.com/gp/cart/view.html?ref_=nav_cart'
   wait_for_cart
   goto_time_windows
@@ -117,5 +118,6 @@ def complete_checkout
     find('#continue-top').click
     page.should have_text('Place your order')
     find('#placeYourOrder').click
+    Log.info 'Checkout completed!'
   end
 end
