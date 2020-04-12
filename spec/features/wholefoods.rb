@@ -119,5 +119,6 @@ def complete_checkout
     page.should have_text('Place your order')
     find('#placeYourOrder').click
     Log.info 'Checkout completed!'
+    sleep 1800 # I need to know what the page looks like after
   end
 end
