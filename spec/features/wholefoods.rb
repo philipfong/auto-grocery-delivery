@@ -80,7 +80,7 @@ def select_day
         page.should_not have_text('No delivery windows available')
       end
     end
-  rescue *EXCEPTIONS => e
+  rescue Exception => e
     Log.error 'Something went wrong selecting a day where availability was found. Error was %s' % e
     page.save_page # Save some information for troubleshooting if something goes wrong here
     restart_checkout
@@ -94,7 +94,7 @@ def select_time
     find('.a-button-primary', :text => 'Continue').click
     Log.info 'We have selected a timeslot and am attempting to leave the timeslot page now.'
     page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
-  rescue *EXCEPTIONS => e
+  rescue Exception => e
     Log.error 'Something went wrong selecting a free timeslot. Error was %s' % e
     page.save_page
     restart_checkout
@@ -111,7 +111,7 @@ def retry_if_no_availability
       sleep random_seconds
       visit current_url
       page.should_not have_text('Select a window to continue')
-    rescue *EXCEPTIONS => e
+    rescue Exception => e
       Log.error 'Something went wrong trying to refresh the page, but we\'ll try to continue anyway.'
     end
   end
