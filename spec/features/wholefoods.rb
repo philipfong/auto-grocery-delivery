@@ -80,8 +80,8 @@ def check_availability
         all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click # Click the last timeslot available. Perhaps this gets last traffic.
         sleep 1
         find('.a-button-primary', :text => 'Continue').click
-        Log.info 'We have clicked on the continue button and should leave the timeslot page.'
-        page.should_not have_text('Schedule your order', :wait => 1800) # This can take an incredibly long time with the loading spinner showing up
+        Log.info 'We have selected a timeslot and am attempting to leave the timeslot page now.'
+        page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
       end
     end
   rescue RSpec::Expectations::ExpectationNotMetError => e
@@ -94,13 +94,17 @@ end
 
 def retry_if_no_availability
   if @timeslot_found == false
-    random_seconds = rand(3..10)
-    Log.info 'Bummer, nothing is available. Trying again after waiting for %s seconds.' % random_seconds
-    find('.a-button-primary', :text => 'Continue').click # Do this so Capybara can detect change in page refresh
-    page.should have_text('Select a window to continue')
-    # sleep random_seconds
-    visit current_url
-    page.should_not have_text('Select a window to continue')
+    begin
+      random_seconds = rand(1..5)
+      Log.info 'Bummer, nothing is available. Trying again after waiting for %s seconds.' % random_seconds
+      find('.a-button-primary', :text => 'Continue').click # Do this so Capybara can detect change in page refresh
+      page.should have_text('Select a window to continue')
+      sleep random_seconds
+      visit current_url
+      page.should_not have_text('Select a window to continue')
+    rescue RSpec::Expectations::ExpectationNotMetError => e
+      Log.error 'Something went wrong trying to refresh the page, but we\'ll try to continue anyway.'
+    end
   end
 end
 
@@ -113,12 +117,12 @@ end
 
 def complete_checkout
   Log.info 'Attempting to complete checkout now.'
-  using_wait_time 1800 do
+  using_wait_time 60 do # Wait a maximum of one minute for these pages to show up. Otherwise we're going to fail.
     page.should have_text('Select a payment method')
     find('#continue-top').click
-    page.should have_text('Place your order')
+    page.should have_text('Review your Whole Foods Market order')
     find('#placeYourOrder').click
+    page.should have_text('Thank you, your Whole Foods Market order has been placed')
     Log.info 'Checkout completed!'
-    sleep 1800 # I need to know what the page looks like after
   end
 end
