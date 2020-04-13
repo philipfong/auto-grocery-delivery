@@ -28,7 +28,7 @@ def wait_for_cart
       page.should have_css('.a-button-primary', :text => 'Checkout Whole Foods Market Cart')
       cart_found = true
       Log.info 'Hi there! Looks like you are at your Amazon cart. Proceeding with checkout...'
-    rescue *EXCEPTIONS
+    rescue Exception
       Log.info 'I am waiting for you to get to your cart. Take your time!'
       sleep 60
       retry
@@ -43,7 +43,7 @@ def goto_time_windows
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
     page.should have_text('Substitution preferences')
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
-  rescue *EXCEPTIONS
+  rescue Exception
     Log.error 'I ran into some problems moving across pages. I\'ll start over.'
     restart_checkout
   end
@@ -54,7 +54,7 @@ def get_timeslot
   while !@timeslot_found
     begin
       page.should have_text('Schedule your order', :wait => 30) # This page can show up so embarassingly slow for Amazon. Pls.
-    rescue *EXCEPTIONS
+    rescue Exception
       Log.info 'Maybe got kicked out to some other page? Going to try to checkout for you again.'
       restart_checkout
       next
