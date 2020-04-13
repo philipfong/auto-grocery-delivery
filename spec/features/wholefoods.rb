@@ -59,12 +59,13 @@ def get_timeslot
       restart_checkout
       next
     end
-    check_availability
+    select_day
+    select_time if @timeslot_found
     retry_if_no_availability
   end
 end
 
-def check_availability
+def select_day
   begin
     date_buttons = all('button[name*="2020"]', :minimum => 1)
     date_buttons.each.with_index do |button, index|
@@ -77,16 +78,25 @@ def check_availability
         date_buttons[index].click # Select the date
         Log.info 'We have clicked on the date where availability was found.'
         page.should_not have_text('No delivery windows available')
-        all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click # Click on first timeslot available
-        sleep 1 # I hate this with a passion, but things seem to work better with this until I can figure a way without it
-        find('.a-button-primary', :text => 'Continue').click
-        Log.info 'We have selected a timeslot and am attempting to leave the timeslot page now.'
-        page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
       end
     end
   rescue RSpec::Expectations::ExpectationNotMetError => e
-    Log.error 'Something went wrong finding and selecting an available timeslot. Restarting checkout. Error was %s' % e
+    Log.error 'Something went wrong selecting a day where availability was found. Error was %s' % e
     page.save_page # Save some information for troubleshooting if something goes wrong here
+    restart_checkout
+  end
+end
+
+def select_time
+  begin
+    all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click # Click on first timeslot available
+    sleep 1 # I hate this with a passion, but things seem to work better with this until I can figure a way without it
+    find('.a-button-primary', :text => 'Continue').click
+    Log.info 'We have selected a timeslot and am attempting to leave the timeslot page now.'
+    page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
+  rescue RSpec::Expectations::ExpectationNotMetError => e
+    Log.error 'Something went wrong selecting a free timeslot. Error was %s' % e
+    page.save_page
     restart_checkout
   end
 end
