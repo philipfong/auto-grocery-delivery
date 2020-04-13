@@ -77,8 +77,8 @@ def check_availability
         date_buttons[index].click # Select the date
         Log.info 'We have clicked on the date where availability was found.'
         page.should_not have_text('No delivery windows available')
-        all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click # Click the last timeslot available. Perhaps this gets last traffic.
-        sleep 1
+        all('.a-button-normal', :text => 'FREE', :minimum => 1)[0].click # Click on first timeslot available
+        sleep 1 # I hate this with a passion, but things seem to work better with this until I can figure a way without it
         find('.a-button-primary', :text => 'Continue').click
         Log.info 'We have selected a timeslot and am attempting to leave the timeslot page now.'
         page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
@@ -87,7 +87,6 @@ def check_availability
   rescue RSpec::Expectations::ExpectationNotMetError => e
     Log.error 'Something went wrong finding and selecting an available timeslot. Restarting checkout. Error was %s' % e
     page.save_page # Save some information for troubleshooting if something goes wrong here
-    page.save_screenshot
     restart_checkout
   end
 end
@@ -117,12 +116,20 @@ end
 
 def complete_checkout
   Log.info 'Attempting to complete checkout now.'
-  using_wait_time 60 do # Wait a maximum of one minute for these pages to show up. Otherwise we're going to fail.
+  using_wait_time 60 do # This becomes a critical path in our workflow, so extend the maximum wait time before we consider it a failure. Obviously if elements show up in a shorter time, fantastic.
     page.should have_text('Select a payment method')
     find('#continue-top').click
     page.should have_text('Review your Whole Foods Market order')
     find('#placeYourOrder').click
-    page.should have_text('Thank you, your Whole Foods Market order has been placed')
-    Log.info 'Checkout completed!'
+    if page.has_text?('Thank you, your Whole Foods Market order has been placed')
+      Log.info 'Checkout completed! We are so done!'
+    elsif page.has_text?('No delivery windows available')
+      Log.info 'Amazon just took a dump on our order and kicked us all the way out. Gonna have to start all over.'
+      restart_checkout
+    else
+      Log.error 'I didn\'t see the confirmation page or get kicked out to the timeslot delivery page. Just gonna fail then.'
+      page.save_page
+      fail 'We got like 99 percent there but something messed up. Please send html captures to Github.'
+    end
   end
 end
