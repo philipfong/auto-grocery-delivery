@@ -25,7 +25,7 @@ def open_instacart
   begin
     visit 'https://www.instacart.com/'
     page.should have_text 'Groceries delivered in as little as 1 hour'
-  rescue Exception => e
+  rescue *EXCEPTIONS => e
     Log.error 'You might be having problems getting this running in the first place, or Instacart changed their homepage content. Please reach out to me on Github for help.'
     fail 'Could not load Instacart page'
   end
@@ -52,7 +52,7 @@ def wait_for_checkout_page
       page.should have_text('No delivery times available')
       checkout_found = true
       Log.info 'Hi there! Looks like you are on the checkout page. Proceeding with checking delivery time slots...'
-    rescue RSpec::Expectations::ExpectationNotMetError
+    rescue *EXCEPTIONS
       Log.info 'I am waiting for you to checkout. Take your time!'
       sleep 60
       retry
@@ -85,7 +85,7 @@ def wait_for_timeslot
         Log.error 'I can\'t seem to find what I\'m looking for anymore, are you sure you\'re on the checkout page? I\'ll try to get there myself.'
         goto_checkout
       end
-    rescue Exception => e
+    rescue *EXCEPTIONS => e
       Log.error 'Something else went wrong. Retrying anyway. Error was: %s' % e
       retry
     end
@@ -96,7 +96,7 @@ def wait_for_instacart_throbber
   begin
     page.should have_css('.ic-loading')
     page.should_not have_css('.ic-loading')
-  rescue Exception => e
+  rescue Exception # Rescue all, IME checks on spinners can produce a stale element exception from webdriver
     Log.error 'Something wrong happened checking for Instacart\'s spinny animations. This is not important enough to do something about, so let\s do nothing.'
   end
 end
@@ -114,7 +114,7 @@ def select_delivery_time
         Log.info 'Timeslot selected'
       end
     end
-  rescue Exception => e
+  rescue *EXCEPTIONS => e
     Log.error 'Something went wrong once the choose timeslot button was found %s' % e
     fail 'Failing because choosing the timeslot didn\'t work out'
   end
@@ -154,7 +154,7 @@ def place_order
   begin
     page.should have_css('button', :text => 'Place order')
     all('button', :text => 'Place order', :minimum => 1)[0].click
-  rescue Exception => e
+  rescue *EXCEPTIONS => e
     Log.error 'Something went wrong once the place order button was found'
     Log.error e
     fail 'Failing because order could not be placed'

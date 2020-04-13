@@ -1,3 +1,5 @@
+EXCEPTIONS = [Capybara::ElementNotFound, RSpec::Expectations::ExpectationNotMetError]
+
 class Log
   @@logger = Logger.new STDOUT
   @@logger.level = Logger::DEBUG

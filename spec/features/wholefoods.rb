@@ -28,7 +28,7 @@ def wait_for_cart
       page.should have_css('.a-button-primary', :text => 'Checkout Whole Foods Market Cart')
       cart_found = true
       Log.info 'Hi there! Looks like you are at your Amazon cart. Proceeding with checkout...'
-    rescue RSpec::Expectations::ExpectationNotMetError
+    rescue *EXCEPTIONS
       Log.info 'I am waiting for you to get to your cart. Take your time!'
       sleep 60
       retry
@@ -43,7 +43,7 @@ def goto_time_windows
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
     page.should have_text('Substitution preferences')
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
-  rescue RSpec::Expectations::ExpectationNotMetError
+  rescue *EXCEPTIONS
     Log.error 'I ran into some problems moving across pages. I\'ll start over.'
     restart_checkout
   end
@@ -54,7 +54,7 @@ def get_timeslot
   while !@timeslot_found
     begin
       page.should have_text('Schedule your order', :wait => 30) # This page can show up so embarassingly slow for Amazon. Pls.
-    rescue RSpec::Expectations::ExpectationNotMetError
+    rescue *EXCEPTIONS
       Log.info 'Maybe got kicked out to some other page? Going to try to checkout for you again.'
       restart_checkout
       next
@@ -80,7 +80,7 @@ def select_day
         page.should_not have_text('No delivery windows available')
       end
     end
-  rescue RSpec::Expectations::ExpectationNotMetError => e
+  rescue *EXCEPTIONS => e
     Log.error 'Something went wrong selecting a day where availability was found. Error was %s' % e
     page.save_page # Save some information for troubleshooting if something goes wrong here
     restart_checkout
@@ -94,7 +94,7 @@ def select_time
     find('.a-button-primary', :text => 'Continue').click
     Log.info 'We have selected a timeslot and am attempting to leave the timeslot page now.'
     page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
-  rescue RSpec::Expectations::ExpectationNotMetError => e
+  rescue *EXCEPTIONS => e
     Log.error 'Something went wrong selecting a free timeslot. Error was %s' % e
     page.save_page
     restart_checkout
@@ -111,7 +111,7 @@ def retry_if_no_availability
       sleep random_seconds
       visit current_url
       page.should_not have_text('Select a window to continue')
-    rescue RSpec::Expectations::ExpectationNotMetError => e
+    rescue *EXCEPTIONS => e
       Log.error 'Something went wrong trying to refresh the page, but we\'ll try to continue anyway.'
     end
   end
