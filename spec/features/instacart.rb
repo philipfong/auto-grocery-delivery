@@ -129,6 +129,7 @@ end
 def reconfirm_payment
   if page.has_text?('Please re-enter your card number.') # This also comes up on occasion, mostly for those who have never placed an Instacart order
     Log.info 'Payment info was requested'
+    page.save_page # I don't know what this looks like, so this will help further development
     if @card_info_found == false
       Log.error 'We aren\'t able to complete checkout due to Instacart asking to reconfirm card details.'
       fail 'Sorry about that. It looks like Instacart needs your card info again. We\'re going to stop here.'
