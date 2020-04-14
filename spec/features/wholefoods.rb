@@ -107,6 +107,7 @@ def select_day
         date_buttons[index].click # Select the date
         Log.info 'We have clicked on the date where availability was found.'
         page.should_not have_text('No delivery windows available')
+        break # Don't go on to check other dates since we found the one we want
       end
     end
   rescue Exception => e
