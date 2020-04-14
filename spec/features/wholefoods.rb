@@ -120,8 +120,13 @@ end
 
 def restart_checkout
   Log.info 'Restarting checkout. Something must\'ve went wrong just before this.'
-  visit 'https://www.amazon.com/gp/cart/view.html?ref_=nav_cart'
-  wait_for_cart
+  begin
+    visit 'https://www.amazon.com/gp/cart/view.html?ref_=nav_cart'
+    page.should have_css('.a-button-primary', :text => 'Checkout Whole Foods Market Cart')
+  rescue Exception
+    Log.error 'Could not find checkout page. Retrying.'
+    retry
+  end
   goto_time_windows
 end
 
