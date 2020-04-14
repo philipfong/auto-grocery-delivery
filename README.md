@@ -15,6 +15,8 @@ So far, I've written scripts for Instacart and Amazon Whole Foods (not to be con
 
 A lot of other scripts will add sleep/delays in order to wait for pages. This set of scripts waits for page elements with a timeout of 10 seconds. This is all credit to [team capybara](https://github.com/teamcapybara/capybara).
 
+Other than the tech stack behind it, a lot of code is written here to tirelessly work around some of the flakiness that some of these sites present due to the traffic they're getting. The scripts here are also designed to step all the way from cart to successful checkout on its own.
+
 ### Pre-requisites ###
 
 The easiest part is to just fill your cart. Go to the checkout screen (Instacart) or cart screen (Amazon) when you're done. For Instacart, this will not work if you have items added from multiple stores, so please stick with just one.
@@ -23,11 +25,16 @@ The next easiest part is making sure you complete _all_ of the information in yo
 
 The hardest part will be getting this script running in the first place. If you're not too tech-savvy, it can be a little bit of a challenge. I've really dumbed down the 'Install and Run' steps below, and will try to add a tutorial when I can.
 
-### Install and Run ###
+### Installation ###
 
 1. Install a Ruby version manager such as rbenv or rvm (on Windows, check out https://rubyinstaller.org/)
 2. Clone the repo
 3. `gem install bundler`
 4. `bundle install`
-5. Run scripts: `rspec spec/features/instacart.rb`
-6. Profit
+
+### Running ###
+
+1. `rspec spec/features/wholefoods.rb` or `rspec spec/features/instacart.rb`
+2. (For Whole Foods) This works better if you set your password in you terminal first (but is absolutely not required). This is because Amazon has prompted for the account password again during the checkout process. This will set an environmental variable that only the local computer has any knowledge of. Pretending that your password is `password123`:
+* For Windows, type in `SET PW=password123`, hit `ENTER`, then run the commands in step 1
+* For Mac, prepend `PW=password123 ` to the commands in step 1
