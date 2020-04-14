@@ -93,6 +93,7 @@ def select_time
     sleep 1 # I hate this with a passion, but things seem to work better with this until I can figure a way without it
     find('.a-button-primary', :text => 'Continue').click
     Log.info 'We have selected a timeslot and am attempting to leave the timeslot page now.'
+    page.save_page # Get a screenshot of available time windows that were open
     page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
   rescue Exception => e
     Log.error 'Something went wrong selecting a free timeslot. Error was %s' % e
@@ -126,20 +127,20 @@ end
 
 def complete_checkout
   Log.info 'Attempting to complete checkout now.'
-  using_wait_time 60 do # This becomes a critical path in our workflow, so extend the maximum wait time before we consider it a failure. Obviously if elements show up in a shorter time, fantastic.
-    page.should have_text('Select a payment method')
-    find('#continue-top').click
-    page.should have_text('Review your Whole Foods Market order')
-    find('#placeYourOrder').click
-    if page.has_text?('Thank you, your Whole Foods Market order has been placed')
+  begin
+    using_wait_time 60 do # This becomes a critical path in our workflow, so extend the maximum wait time before we consider it a failure. Obviously if elements show up in a shorter time, fantastic.
+      page.should have_text('Select a payment method')
+      Log.info 'Reached payment page'
+      find('#continue-top').click
+      page.should have_text('Review your Whole Foods Market order')
+      Log.info 'Reached final checkout page'
+      find('#placeYourOrder').click
+      page.should have_text('Thank you, your Whole Foods Market order has been placed')
       Log.info 'Checkout completed! We are so done!'
-    elsif page.has_text?('No delivery windows available')
-      Log.info 'Amazon just took a dump on our order and kicked us all the way out. Gonna have to start all over.'
-      restart_checkout
-    else
-      Log.error 'I didn\'t see the confirmation page or get kicked out to the timeslot delivery page. Just gonna fail then.'
-      page.save_page
-      fail 'We got like 99 percent there but something messed up. Please send html captures to Github.'
     end
+  rescue Exception => e
+    Log.error 'Amazon just took a dump on our order and likely kicked us all the way out. Gonna have to start all over.'
+    page.save_page
+    restart_checkout
   end
 end
