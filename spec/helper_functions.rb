@@ -11,3 +11,6 @@ class Log
     @@logger.error(msg)
   end
 end
+
+class NoPasswordError < StandardError; end
+class InvalidPasswordError < StandardError; end

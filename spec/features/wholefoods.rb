@@ -2,6 +2,12 @@ require 'spec_helper'
 
 feature "Check time slots for Whole Foods" do
 
+  before(:all) do
+    if ENV["PW"] == nil
+      Log.info 'Password was not passed to the script, which is totally fine. We will have to fail if Amazon signs us out.'
+    end
+  end
+
   scenario "Amazon Whole Foods" do
     open_amazon
     wait_for_cart
@@ -39,12 +45,36 @@ end
 def goto_time_windows
   begin
     find('.a-button-primary', :text => 'Checkout Whole Foods Market Cart').click
+    reconfirm_password
     page.should have_text('Before you checkout')
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
     page.should have_text('Substitution preferences')
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
   rescue Exception
     Log.error 'I ran into some problems moving across pages. I\'ll start over.'
+    restart_checkout
+  end
+end
+
+def reconfirm_password
+  begin
+    if page.has_css?('#ap_password', :wait => 2)
+      if ENV["PW"].nil?
+        puts 'I am here also'
+        raise NoPasswordError, 'Password was requested but there is nothing we can do about it. We need to stop here.'
+      else
+        find('#ap_password').set(ENV["PW"])
+        find('#signInSubmit').click
+      end
+    end
+    if page.has_text?('Your password is incorrect')
+      raise InvalidPasswordError, 'Password was entered but was incorrect. We need to stop here.'
+    end
+  rescue => e
+    Log.error e
+  rescue Exception
+    Log.error 'Password was requested but something went wrong getting past this point. Restarting checkout.'
+    page.save_page
     restart_checkout
   end
 end
