@@ -60,7 +60,6 @@ def reconfirm_password
   begin
     if page.has_css?('#ap_password', :wait => 2)
       if ENV["PW"].nil?
-        puts 'I am here also'
         raise NoPasswordError, 'Password was requested but there is nothing we can do about it. We need to stop here.'
       else
         find('#ap_password').set(ENV["PW"])
