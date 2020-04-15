@@ -13,7 +13,7 @@ So far, I've written scripts for Instacart and Amazon Whole Foods (not to be con
 
 ### Some advantages over other tools ###
 
-A lot of other scripts will add sleep/delays in order to wait for pages. This set of scripts waits for page elements with a timeout of 10 seconds. This is all credit to [team capybara](https://github.com/teamcapybara/capybara).
+A lot of other scripts will add sleep/delays in order to wait for pages. This set of scripts waits for page elements with a timeout of 5 seconds. This is all credit to [team capybara](https://github.com/teamcapybara/capybara).
 
 Other than the tech stack behind it, a lot of code is written here to tirelessly work around some of the flakiness that some of these sites present due to the traffic they're getting. The scripts here are also designed to step all the way from cart to successful checkout on its own.
 
