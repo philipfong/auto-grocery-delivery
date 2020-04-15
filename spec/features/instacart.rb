@@ -175,6 +175,7 @@ def place_order
     all('button', :text => 'Place order', :minimum => 1)[0].click
     sleep 30 # I forget what the confirmation page looks like
     Log.info 'Checkout completed! We are so done!'
+    page.save_page
   rescue Exception => e
     Log.error 'Something went wrong once the place order button was found'
     Log.error e
