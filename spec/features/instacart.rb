@@ -122,7 +122,7 @@ def select_delivery_time
     while !timeslot_selected
       find('[id*="Delivery"]').all('input[name="delivery_option"]', :minimum => 1)[0].click # Find and click first available
       wait_for_instacart_throbber
-      if page.has_css?('[id*="Delivery"]') # Here we probably got the "Demand is higher than normal message" and have to try again
+      if page.has_css?('[id*="Delivery"]') # Here we probably got the "Demand is higher than normal message" and forced to select a different available slot
         next
       else
         page.should_not have_css('[id*="Delivery"]')
