@@ -158,6 +158,8 @@ def restart_checkout
     retry
   end
   goto_time_windows
+  get_timeslot
+  complete_checkout
 end
 
 def complete_checkout
