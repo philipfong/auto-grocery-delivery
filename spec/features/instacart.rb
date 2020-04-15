@@ -31,7 +31,7 @@ def wait_for_checkout_page
   checkout_found = false
   while !checkout_found
     begin
-      page.should have_text('No delivery times available')
+      page.should have_text('No delivery times available') # For first-time users, you may need to confirm you address before reaching this step
       checkout_found = true
       Log.info 'Hi there! Looks like you are on the checkout page. Proceeding with checking delivery time slots...'
     rescue Exception
@@ -43,7 +43,6 @@ def wait_for_checkout_page
 end
 
 def complete_checkout
-  confirm_address
   wait_for_timeslot
   select_delivery_time
   set_delivery_instructions
@@ -65,14 +64,6 @@ def restart_checkout
   page.should have_text('Choose delivery time')
   wait_for_instacart_throbber
   complete_checkout
-end
-
-def confirm_address
-  if page.has_text?('Add delivery address', :wait => 2)
-    find('textarea[placeholder="Instructions for delivery (optional)"]').set('Please leave at doorstep.')
-    click_button('Confirm')
-    wait_for_instacart_throbber
-  end
 end
 
 def wait_for_timeslot
