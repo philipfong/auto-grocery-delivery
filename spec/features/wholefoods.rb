@@ -45,9 +45,9 @@ end
 def goto_time_windows
   begin
     find('.a-button-primary', :text => 'Checkout Whole Foods Market Cart').click
-    reconfirm_password
     page.should have_text('Before you checkout')
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
+    reconfirm_password
     page.should have_text('Substitution preferences')
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
   rescue Exception
