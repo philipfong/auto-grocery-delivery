@@ -1,6 +1,6 @@
 ### What is this? ###
 
-Everyone's been having a tough time getting delivery slots for grocery delivery during the Covid-19 epidemic. This is intended to save folks some time refreshing their browser throughout the day.
+Everyone's been having a tough time getting delivery slots for grocery delivery during the Covid-19 pandemic. This is intended to save folks some time refreshing their browser throughout the day.
 
 So far, I've written scripts for Instacart and Amazon Whole Foods (not to be confused with Prime Now).
 
