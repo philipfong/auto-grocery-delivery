@@ -38,4 +38,4 @@ The hardest part will be getting this script running in the first place. If you'
 2. (For Whole Foods) This works better if you set your password in your terminal first (but is absolutely not required). This is because Amazon has prompted for the account password again during the checkout process. This will set an environmental variable that only the local computer has any knowledge of. Pretending that your password is `password123`:
 * For Windows, type in `SET PW=password123`, hit `ENTER`, then run the commands in step 1
 * For Mac, prepend `PW=password123 ` to the commands in step 1
-* If you're having trouble on Mac, try to prepend `bundle exec ` to your command
+3. If you're having trouble on Mac, try to prepend `bundle exec ` to your command
