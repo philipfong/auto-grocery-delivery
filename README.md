@@ -7,7 +7,7 @@ So far, I've written scripts for Instacart and Amazon Whole Foods (not to be con
 ### How does this work? ###
 
 1. The script will open a brand new browser session in Chrome
-2. It will then visit the website in that Chrome window. From there you can shop around and add items to your cart.
+2. It will then visit the website in that Chrome window. From there you can shop around and add items to your cart, but it's recommended that you have your cart already filled prior to running this.
 3. It will wait for you to reach the checkout page (for Instacart) or your cart page (for Amazon). If there are no delivery windows available, the script will wait a random number of seconds and refresh the page.
 4. If a timeslot becomes open, it will select it immediately and attempt the checkout process automatically.
 
@@ -38,3 +38,4 @@ The hardest part will be getting this script running in the first place. If you'
 2. (For Whole Foods) This works better if you set your password in your terminal first (but is absolutely not required). This is because Amazon has prompted for the account password again during the checkout process. This will set an environmental variable that only the local computer has any knowledge of. Pretending that your password is `password123`:
 * For Windows, type in `SET PW=password123`, hit `ENTER`, then run the commands in step 1
 * For Mac, prepend `PW=password123 ` to the commands in step 1
+* If you're having trouble on Mac, try to prepend `bundle exec ` to your command
