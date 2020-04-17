@@ -165,9 +165,8 @@ def place_order
   begin
     page.should have_css('button', :text => 'Place order')
     all('button', :text => 'Place order', :minimum => 1)[0].click
-    sleep 30 # I forget what the confirmation page looks like
+    page.should_not have_css('button', :text => 'Place order', :wait => 120) # Wait max 2 minutes for checkout page to go away
     Log.info 'Checkout completed! We are so done!'
-    page.save_page
   rescue Exception => e
     Log.error 'Something went wrong once the place order button was found'
     Log.error e
