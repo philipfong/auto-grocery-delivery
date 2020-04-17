@@ -59,18 +59,12 @@ end
 
 def restart_checkout
   Log.info 'Restarting checkout. Something must have went wrong just before this.'
-  begin
-    visit 'https://www.instacart.com'
-    click_button('Cart')
-    click_link('Go to Checkout')
-    page.should have_text('Choose delivery time')
-    wait_for_instacart_throbber
-    complete_checkout
-  rescue Exception => e
-    Log.error 'Could not restart checkout. Not good. Retrying anyway.
-    Log.error e
-    retry
-  end
+  visit 'https://www.instacart.com'
+  click_button('Cart')
+  click_link('Go to Checkout')
+  page.should have_text('Choose delivery time')
+  wait_for_instacart_throbber
+  complete_checkout
 end
 
 def wait_for_timeslot
