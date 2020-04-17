@@ -124,7 +124,7 @@ def select_delivery_time
       end
     end
   rescue Exception => e
-    Log.error 'Something went wrong after we saw timeslots available %s' % e
+    Log.error 'Something went wrong after we saw timeslots available. Error was %s' % e
     fail 'Failing because choosing the timeslot didn\'t work out.'
   end
 end
