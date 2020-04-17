@@ -69,6 +69,7 @@ def restart_checkout
   rescue Exception => e
     Log.error 'Could not restart checkout. Not good. Retrying anyway.
     Log.error e
+    retry
   end
 end
 
