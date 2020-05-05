@@ -39,3 +39,5 @@ The hardest part will be getting this script running in the first place. If you'
 * For Windows, type in `SET PW=password123`, hit `ENTER`, then run the commands in step 1
 * For Mac, prepend `PW=password123 ` to the commands in step 1
 3. If you're having trouble on Mac, try to prepend `bundle exec ` to your command
+
+New option (for Whole Foods): Just set `SAMEDAY=yes`. Looks for same-day delivery for up to 4 hours. After that time, will expand search to all dates.
