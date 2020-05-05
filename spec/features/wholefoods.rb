@@ -186,7 +186,7 @@ def complete_checkout
       Log.info 'Checkout completed! We are so done!'
     end
   rescue Exception => e
-    Log.error 'Amazon just took a dump on our order and likely kicked us all the way out. Gonna have to start all over.'
+    Log.error 'Amazon just took a dump on our order and likely kicked us all the way out. Gonna have to start all over. Error was: %s' % e
     page.save_page
     restart_checkout
   end
