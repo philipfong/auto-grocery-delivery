@@ -93,11 +93,10 @@ def get_timeslot
     rescue Exception
       Log.info 'Maybe got kicked out to some other page? Going to try to checkout for you again.'
       restart_checkout
-      next
     end
     select_day
     select_time if @timeslot_found
-    retry_if_no_availability
+    refresh_if_no_availability
   end
 end
 
@@ -112,7 +111,7 @@ def select_day
         Log.info 'Oooh-weee, we found availability on %s!' % name
         if ENV["SAMEDAY"] && name != @today && Time.now - @start_time < 14400
           Log.info 'Even though we found availability, we\'re going to keep looking.'
-          next
+          break
         end
         @timeslot_found = true
         date_buttons[index].click # Select the date
@@ -122,7 +121,7 @@ def select_day
       end
     end
   rescue Exception => e
-    Log.error 'Something went wrong selecting a day where availability was found. Error was %s' % e
+    Log.error 'Something went wrong selecting a day after availability was likely found. Error was %s' % e
     page.save_page # Save some information for troubleshooting if something goes wrong here
     restart_checkout
   end
@@ -143,7 +142,7 @@ def select_time
   end
 end
 
-def retry_if_no_availability
+def refresh_if_no_availability
   if @timeslot_found == false
     begin
       random_seconds = rand(1..5)
