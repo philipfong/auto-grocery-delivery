@@ -6,6 +6,13 @@ feature "Check time slots for Whole Foods" do
     if ENV["PW"] == nil
       Log.info 'Password was not passed to the script, which is totally fine. We will have to fail if Amazon signs us out.'
     end
+    if ENV["SAMEDAY"] == nil
+      Log.info 'You have not opted into same-day delivery, which means we will look for the first available date Amazon offers.'
+    else
+      Log.info 'You have selected same-day delivery. We will look for a delivery window for TODAY for 4 hours. If we can\'t find something in that time, then we will look for something across all days.'
+    end
+    @script_start = Time.now
+    @today = @script_start.strftime("%Y%m%d")
   end
 
   scenario "Amazon Whole Foods" do
@@ -103,6 +110,10 @@ def select_day
         Log.info 'Found no availability on %s' % name
       else
         Log.info 'Oooh-weee, we found availability on %s!' % name
+        if ENV["SAMEDAY"] && name != @today && Time.now - @start_time < 14400
+          Log.info 'Even though we found availability, we\'re going to keep looking.'
+          next
+        end
         @timeslot_found = true
         date_buttons[index].click # Select the date
         Log.info 'We have clicked on the date where availability was found.'
