@@ -109,7 +109,7 @@ def select_day
         Log.info 'Found no availability on %s' % name
       else
         Log.info 'Oooh-weee, we found availability on %s!' % name
-        if ENV["SAMEDAY"] && name != @today && Time.now - @start_time < 14400
+        if ENV["SAMEDAY"] == 'yes' && name.to_s != @today && Time.now - @start_time < 14400
           Log.info 'Even though we found availability, we\'re going to keep looking.'
           break
         end
