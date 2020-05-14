@@ -181,9 +181,14 @@ def complete_checkout
       find('#continue-top').click
       page.should have_text('Review your Whole Foods Market order')
       Log.info 'Reached final checkout page'
-      find('#placeYourOrder').click
-      page.should have_text('Thank you, your Whole Foods Market order has been placed')
-      Log.info 'Checkout completed! We are so done!'
+      num_items = all('.asin-title', :minimum => 1).size.to_s
+      if ENV["ITEMS"] && ENV["ITEMS"] != num_items
+        Log.error 'Something went missing from your cart. We are going to stop here.'
+      else
+        find('#placeYourOrder').click
+        page.should have_text('Thank you, your Whole Foods Market order has been placed')
+        Log.info 'Checkout completed! We are so done!'
+      end
     end
   rescue Exception => e
     Log.error 'Amazon just took a dump on our order and likely kicked us all the way out. Gonna have to start all over. Error was: %s' % e
