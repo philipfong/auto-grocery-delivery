@@ -11,6 +11,11 @@ feature "Check time slots for Whole Foods" do
     else
       Log.info 'You have selected same-day delivery. We will look for a delivery window for TODAY for 4 hours. If we can\'t find something in that time, then we will look for something across all days.'
     end
+    if ENV["FULLCART"] == nil
+      Log.info 'We will complete checkout even if some things fall out of your cart, as Amazon does on occasion.'
+    else
+      Log.info 'You have decided that all items in your cart are essential. We will stop checkout if some things fall out of your cart.'
+    end
     @script_start = Time.now
     @today = @script_start.strftime("%Y%m%d")
   end
@@ -40,10 +45,11 @@ def wait_for_cart
     begin
       page.should have_css('.a-button-primary', :text => 'Checkout Whole Foods Market Cart')
       cart_found = true
-      Log.info 'Hi there! Looks like you are at your Amazon cart. Proceeding with checkout...'
+      @num_items_in_cart = all('.sc-list-item-content', :minimum => 1).size
+      Log.info 'Hi there! Looks like you are at your Amazon cart. We found %s unique items. Proceeding with checkout...' % @num_items_in_cart
     rescue Exception
       Log.info 'I am waiting for you to get to your cart. Take your time!'
-      sleep 60
+      sleep 30
       retry
     end
   end
@@ -181,8 +187,9 @@ def complete_checkout
       find('#continue-top').click
       page.should have_text('Review your Whole Foods Market order')
       Log.info 'Reached final checkout page'
-      num_items = all('.asin-title', :minimum => 1).size.to_s
-      if ENV["ITEMS"] && ENV["ITEMS"] != num_items
+      num_items_on_checkout = all('.asin-title', :minimum => 1).size
+      Log.info 'We found %s unique items on the final checkout page.' % num_items_on_checkout
+      if ENV["FULLCART"] && @num_items_in_cart != num_items_on_checkout
         Log.error 'Something went missing from your cart. We are going to stop here.'
         page.save_page
       else
