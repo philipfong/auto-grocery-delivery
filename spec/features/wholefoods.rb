@@ -184,6 +184,7 @@ def complete_checkout
       num_items = all('.asin-title', :minimum => 1).size.to_s
       if ENV["ITEMS"] && ENV["ITEMS"] != num_items
         Log.error 'Something went missing from your cart. We are going to stop here.'
+        page.save_page
       else
         find('#placeYourOrder').click
         page.should have_text('Thank you, your Whole Foods Market order has been placed')
