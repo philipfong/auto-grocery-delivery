@@ -23,9 +23,15 @@ feature "Check time slots for Whole Foods" do
   scenario "Amazon Whole Foods" do
     open_amazon
     wait_for_cart
-    goto_time_windows
-    get_timeslot
-    complete_checkout
+    begin
+      goto_time_windows
+      get_timeslot
+      complete_checkout
+    rescue Exception => e
+      Log.error 'Something wrong happened during checkout. We will start over. Error was: %s' % e
+      revisit_cart
+      retry
+    end
   end
 
 end
@@ -64,6 +70,16 @@ def wait_for_cart
   end
 end
 
+def revisit_cart
+  begin
+    visit 'https://www.amazon.com/gp/cart/view.html?ref_=nav_cart'
+    page.should have_css('.a-button-primary', :text => 'Checkout Whole Foods Market Cart')
+  rescue Exception => e
+    Log.error 'Could not visit cart and will retry. Error was %s' % e
+    retry
+  end
+end
+
 def goto_time_windows
   begin
     find('.a-button-primary', :text => 'Checkout Whole Foods Market Cart').click
@@ -73,8 +89,7 @@ def goto_time_windows
     page.should have_text('Substitution preferences')
     all('.a-button-primary', :text => 'Continue', :count => 2)[0].click
   rescue Exception
-    Log.error 'I ran into some problems moving across pages. I\'ll start over.'
-    restart_checkout
+    fail 'I ran into some problems moving across pages. I\'ll start over.'
   end
 end
 
@@ -94,9 +109,8 @@ def reconfirm_password
   rescue => e
     Log.error e
   rescue Exception
-    Log.error 'Password was requested but something went wrong getting past this point. Restarting checkout.'
     page.save_page
-    restart_checkout
+    fail 'Password was requested but something went wrong getting past this point. Restarting checkout.'
   end
 end
 
@@ -106,8 +120,7 @@ def get_timeslot
     begin
       page.should have_text('Schedule your order', :wait => 30) # This page can show up so embarassingly slow for Amazon. Pls.
     rescue Exception
-      Log.info 'Maybe got kicked out to some other page? Going to try to checkout for you again.'
-      restart_checkout
+      fail 'Maybe got kicked out to some other page? Going to try to checkout for you again.'
     end
     select_day
     select_time if @timeslot_found
@@ -136,9 +149,8 @@ def select_day
       end
     end
   rescue Exception => e
-    Log.error 'Something went wrong selecting a day after availability was likely found. Error was %s' % e
     page.save_page # Save some information for troubleshooting if something goes wrong here
-    restart_checkout
+    fail 'Something went wrong selecting a day after availability was likely found. Error was %s' % e
   end
 end
 
@@ -151,9 +163,8 @@ def select_time
     page.save_page # Get a screenshot of available time windows that were open
     page.should_not have_text('Schedule your order', :wait => 120) # Use this expectation to ensure we have left the page. Wait a maximum of two minutes.
   rescue Exception => e
-    Log.error 'Something went wrong selecting a free timeslot. Error was %s' % e
     page.save_page
-    restart_checkout
+    fail 'Something went wrong selecting a free timeslot. Error was %s' % e
   end
 end
 
@@ -168,23 +179,9 @@ def refresh_if_no_availability
       visit current_url
       page.should_not have_text('Select a window to continue')
     rescue Exception => e
-      Log.error 'Something went wrong trying to refresh the page, but we\'ll try to continue anyway.'
+      fail 'Something went wrong trying to refresh the page, but we\'ll try to continue anyway.'
     end
   end
-end
-
-def restart_checkout
-  Log.info 'Restarting checkout. Something must\'ve went wrong just before this.'
-  begin
-    visit 'https://www.amazon.com/gp/cart/view.html?ref_=nav_cart'
-    page.should have_css('.a-button-primary', :text => 'Checkout Whole Foods Market Cart')
-  rescue Exception
-    Log.error 'Could not find checkout page. Retrying.'
-    retry
-  end
-  goto_time_windows
-  get_timeslot
-  complete_checkout
 end
 
 def complete_checkout
@@ -199,8 +196,8 @@ def complete_checkout
       num_items_on_checkout = all('.asin-title', :minimum => 1).size
       Log.info 'We found %s unique items on the final checkout page.' % num_items_on_checkout
       if ENV["FULLCART"] && @num_items_in_cart != num_items_on_checkout
-        Log.error 'Something went missing from your cart. We are going to stop here.'
         page.save_page
+        Log.error 'Something went missing from your cart. We are going to stop here.'
       else
         find('#placeYourOrder').click
         page.should have_text('Thank you, your Whole Foods Market order has been placed')
@@ -208,8 +205,7 @@ def complete_checkout
       end
     end
   rescue Exception => e
-    Log.error 'Amazon just took a dump on our order and likely kicked us all the way out. Gonna have to start all over. Error was: %s' % e
     page.save_page
-    restart_checkout
+    fail 'Amazon just took a dump on our order and likely kicked us all the way out. Gonna have to start all over. Error was: %s' % e
   end
 end
