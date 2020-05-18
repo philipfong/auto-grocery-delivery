@@ -44,8 +44,17 @@ def wait_for_cart
   while !cart_found
     begin
       page.should have_css('.a-button-primary', :text => 'Checkout Whole Foods Market Cart')
+      visit 'https://www.amazon.com/cart/localmarket'
+      sleep 1 # Wait a very brief moment, since we want the list of items to fully load and the number of items is unknown
       cart_found = true
-      @num_items_in_cart = all('.sc-list-item-content', :minimum => 1).size
+      Log.info 'Found cart. Looking for grocery list now.'
+      grocery_list = all('.sc-list-item-content', :minimum => 1)
+      @num_items_in_cart = grocery_list.size
+      puts '=====Grocery List Below====='
+      grocery_list.each do |item|
+        puts item.find('.sc-product-title').text
+      end
+      puts '=====Grocery List Ends Here====='
       Log.info 'Hi there! Looks like you are at your Amazon cart. We found %s unique items. Proceeding with checkout...' % @num_items_in_cart
     rescue Exception
       Log.info 'I am waiting for you to get to your cart. Take your time!'
